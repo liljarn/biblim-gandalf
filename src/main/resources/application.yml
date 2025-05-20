@@ -14,7 +14,7 @@ spring:
       on-profile: default
 
 jwt:
-  secret: youshallnotpassyoushallnotpassyoushallnotpassyoushallnotpassyoushallnotpassyoushallnotpassyoushallnotpassyoushallnotpass
+  secret: texttexttexttext
 
 grpc:
   server:
@@ -23,8 +23,8 @@ grpc:
 cloud:
   aws:
     credentials:
-      access-key: YCAJEtTS6lx1Bk5AJOwfKl316
-      secret-key: YCP3IQK8kM3nbwexMdefg2nG7QWlZ_keK7tQqGm9
+      access-key: text
+      secret-key: text
     region: ru-central1
     endpoint: https://storage.yandexcloud.net
     bucket-name: lib-user-pictures
@@ -55,9 +55,9 @@ web-clients:
     booker:
       destination: http://localhost:8081
       headers:
-        X-INTERNAL-API: GANDALF_INTERNAL_KEY
+        X-INTERNAL-API: text
 
 api:
   management:
     header: X-MANAGEMENT-API
-    key: GANDALF
+    key: text
