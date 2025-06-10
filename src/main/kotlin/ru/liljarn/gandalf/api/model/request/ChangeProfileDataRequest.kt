@@ -9,5 +9,8 @@ data class ChangeProfileDataRequest(
     val firstName: String?,
     val lastName: String?,
     val birthDate: LocalDate?,
+)
+
+data class ChangeProfileImageRequest(
     val profileImage: MultipartFile?
 )

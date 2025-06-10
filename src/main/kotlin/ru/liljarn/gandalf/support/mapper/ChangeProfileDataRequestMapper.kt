@@ -3,7 +3,7 @@ package ru.liljarn.gandalf.support.mapper
 import ru.liljarn.gandalf.api.model.request.ChangeProfileDataRequest
 import ru.liljarn.gandalf.domain.model.dto.ChangedProfileData
 
-fun ChangeProfileDataRequest.toChangedProfileData(password: String?, salt: String?, photoUrl: String?) =
+fun ChangeProfileDataRequest.toChangedProfileData(password: String?, salt: String?) =
     ChangedProfileData(
         email = email,
         password = password,
@@ -11,5 +11,4 @@ fun ChangeProfileDataRequest.toChangedProfileData(password: String?, salt: Strin
         firstName = firstName,
         lastName = lastName,
         birthDate = birthDate,
-        photoUrl = photoUrl
     )

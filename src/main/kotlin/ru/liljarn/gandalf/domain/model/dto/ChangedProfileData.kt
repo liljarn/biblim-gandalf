@@ -9,5 +9,4 @@ data class ChangedProfileData(
     val firstName: String?,
     val lastName: String?,
     val birthDate: LocalDate?,
-    val photoUrl: String?
 )

@@ -2,16 +2,17 @@ package ru.liljarn.gandalf.domain.service.user
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
-import ru.liljarn.gandalf.domain.model.exception.UserAlreadyExistsException
-import ru.liljarn.gandalf.domain.model.exception.WrongPasswordException
 import ru.liljarn.gandalf.api.model.request.AuthenticationRequest
 import ru.liljarn.gandalf.api.model.request.ChangeProfileDataRequest
+import ru.liljarn.gandalf.api.model.request.ChangeProfileImageRequest
 import ru.liljarn.gandalf.api.model.request.RegistrationRequest
 import ru.liljarn.gandalf.api.model.response.UserProfileResponse
 import ru.liljarn.gandalf.domain.client.BookerClient
-import ru.liljarn.gandalf.domain.model.dto.notification.RegistrationNotification
 import ru.liljarn.gandalf.domain.model.dto.UserData
 import ru.liljarn.gandalf.domain.model.dto.UserPrivateData
+import ru.liljarn.gandalf.domain.model.dto.notification.RegistrationNotification
+import ru.liljarn.gandalf.domain.model.exception.UserAlreadyExistsException
+import ru.liljarn.gandalf.domain.model.exception.WrongPasswordException
 import ru.liljarn.gandalf.domain.model.type.NotificationType
 import ru.liljarn.gandalf.domain.service.encryption.EncryptionService
 import ru.liljarn.gandalf.domain.service.image.ImageService
@@ -20,6 +21,7 @@ import ru.liljarn.gandalf.domain.service.user.component.UserDataComponent
 import ru.liljarn.gandalf.support.mapper.toChangedProfileData
 import ru.liljarn.gandalf.support.mapper.toUserPrivateData
 import java.util.*
+import java.util.concurrent.CompletableFuture
 
 private val logger = KotlinLogging.logger {}
 
@@ -49,7 +51,7 @@ class UserService(
         request.toUserPrivateData(uuid, hashedPassword, passwordSalt, photoUrl).apply {
             userDataComponent.createUserData(this)
         }.also {
-            notifyUser(it)
+            CompletableFuture.runAsync { notifyUser(it) }
         }
 
         logger.info { "End of creating user, email=${request.email}" }
@@ -75,23 +77,35 @@ class UserService(
         return userDataComponent.getUserData(userUuid)
     }
 
-    fun getUserProfileInfo(userUuid: UUID): UserProfileResponse =
-        UserProfileResponse(
-            userDataComponent.getUserData(userUuid),
+    fun getUserProfileInfo(userUuid: UUID): UserProfileResponse {
+        val bookingInfo = try {
             bookerClient.getBookingInfo(userUuid)
+        } catch (e: Exception) {
+            logger.error(e) { "Failed to get user booking info" }
+            null
+        }
+
+        return UserProfileResponse(
+            userDataComponent.getUserData(userUuid),
+            bookingInfo
         )
+    }
 
     fun editProfile(userUuid: UUID, request: ChangeProfileDataRequest) {
+        val passwordSalt = if (request.password != null) encryptionService.generateSalt() else null
+        val hashedPassword = request.password?.let { encryptionService.encrypt(it, passwordSalt!!) }
+
+        request.toChangedProfileData(hashedPassword, passwordSalt).let {
+            userDataComponent.editProfile(userUuid, it)
+        }
+    }
+
+    fun editProfilePhoto(userUuid: UUID, request: ChangeProfileImageRequest) {
         val photoUrl = request.profileImage?.let {
             imageService.uploadImage(request.profileImage.inputStream, userUuid.toString())
         }
 
-        val passwordSalt = if (request.password != null) encryptionService.generateSalt() else null
-        val hashedPassword = request.password?.let { encryptionService.encrypt(it, passwordSalt!!) }
-
-        request.toChangedProfileData(hashedPassword, passwordSalt, photoUrl).let {
-            userDataComponent.editProfile(userUuid, it)
-        }
+        userDataComponent.editProfileImage(userUuid, photoUrl)
     }
 
     private fun notifyUser(data: UserPrivateData) = notificationService.sendNotification(
