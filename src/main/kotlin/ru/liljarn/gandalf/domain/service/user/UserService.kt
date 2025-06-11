@@ -101,11 +101,15 @@ class UserService(
     }
 
     fun editProfilePhoto(userUuid: UUID, request: ChangeProfileImageRequest) {
-        val photoUrl = request.profileImage?.let {
+        val photoUrl = request.profileImage.let {
             imageService.uploadImage(request.profileImage.inputStream, userUuid.toString())
         }
 
         userDataComponent.editProfileImage(userUuid, photoUrl)
+    }
+
+    fun deleteProfilePhoto(userUuid: UUID) {
+        userDataComponent.editProfileImage(userUuid, null)
     }
 
     private fun notifyUser(data: UserPrivateData) = notificationService.sendNotification(

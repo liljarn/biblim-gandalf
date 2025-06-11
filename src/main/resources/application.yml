@@ -14,7 +14,7 @@ spring:
       on-profile: default
 
 jwt:
-  secret: texttexttexttext
+  secret: texttexttexttexttexttexttexttexttexttexttexttexttexttexttexttext
 
 grpc:
   server:

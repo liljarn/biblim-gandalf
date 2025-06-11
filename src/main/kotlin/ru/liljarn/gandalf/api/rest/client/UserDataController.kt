@@ -1,5 +1,6 @@
 package ru.liljarn.gandalf.api.rest.client
 
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PathVariable
@@ -45,12 +46,19 @@ class UserDataController(
     }
 
     @PutMapping("/profile/self/photo")
-    fun editProfilePhoto(
+    fun addProfilePhoto(
         @RequestHeader("Authorization") token: String,
         @ModelAttribute req: ChangeProfileImageRequest
     ) {
         token.replace("Bearer ", "").let { jwtToken ->
             userService.editProfilePhoto(jwtService.getUserId(jwtToken), req)
+        }
+    }
+
+    @DeleteMapping("/profile/self/photo")
+    fun deleteProfilePhoto(@RequestHeader("Authorization") token: String) {
+        token.replace("Bearer ", "").let { jwtToken ->
+            userService.deleteProfilePhoto(jwtService.getUserId(jwtToken))
         }
     }
 }

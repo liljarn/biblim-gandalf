@@ -67,6 +67,7 @@ class UserDataComponent(
             )
         )
     }
+
     @Transactional
     fun editProfileImage(userUuid: UUID, photoUrl: String?) {
         val user = userDataRepository.findByUuid(userUuid)
@@ -85,5 +86,4 @@ class UserDataComponent(
             )
         )
     }
-
 }

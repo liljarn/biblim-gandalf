@@ -12,5 +12,5 @@ data class ChangeProfileDataRequest(
 )
 
 data class ChangeProfileImageRequest(
-    val profileImage: MultipartFile?
+    val profileImage: MultipartFile
 )
