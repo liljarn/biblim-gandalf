@@ -61,9 +61,7 @@ cloud:
       access-key: text
       secret-key: text
     endpoint: text
-    bucket-name:
-      book: books-images
-      author: author-images
+    bucket-name: lib-user-pictures
 ```
 
 ### Локальный запуск
